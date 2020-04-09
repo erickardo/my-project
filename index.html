@@ -13,7 +13,7 @@
     </style>
     <meta charset="utf-8">
     <script async defer
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxCrN3-8CYsRl2leka5XwSls98ygSZz9w&callback=initMap">
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxCrN3-8CYsRl2leka5XwSls98ygSZz9w&callback=initMap&libraries=geometry">
 </script>
     <title>Zombieland</title>
   </head>
@@ -21,6 +21,9 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxCrN3-8CYsRl2leka5XwSls9
     <div id="zombie_map">
       <script>
         var zombie_map;
+        var tolerance = 10;
+        var old_position;
+        var score;
         var data = `20.597093475055726 -100.43316418518064 zombie.png
                     20.597565496301684 -100.43102914680479 zombie.png
                     20.599061894420693 -100.43233806480406 zombie.png
@@ -31,14 +34,19 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxCrN3-8CYsRl2leka5XwSls9
                     20.625778 -100.399256 zombie.png
                     20.625945 -100.397955 hospital.png
                     20.626522 -100.397840 weapons.png`
-        
+
         var markers = data.split('\n');
         function initMap(){
-
           zombie_map = new google.maps.Map(document.getElementById('zombie_map'), {
             zoom: 17,
             center: {lat: 20.598443, lng: -100.433765}
           });
+
+          old_position = new google.maps.Marker({
+            position: {lat: 20.598443, lng: -100.433765},
+            map: zombie_map,
+
+          });//ends old position marker
 
           if(navigator.geolocation) {
             navigator.geolocation.watchPosition(set_my_position);
@@ -89,6 +97,7 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxCrN3-8CYsRl2leka5XwSls9
         }//ends initMap
 
         function set_my_position(position){
+          old_position.setMap(null);
           var playerImg = "player.png";
           var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
           var player = new google.maps.Marker({
@@ -97,6 +106,23 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxCrN3-8CYsRl2leka5XwSls9
             icon: playerImg,
           });//ends player marker
 
+          old_position = player;
+          for(i=0; i<all_markers.length; i++){
+            var distance = google.maps.geometry.spherical.computeDistanceBetween(pos, all_markers[i].getPosition());
+            var what_is_it = all_markers[i].getIcon();
+            what_is_it = what_is_it.replace(".png", "")
+
+            if(distance < tolerance){
+              alert("Found the " + what_is_it);
+              all_markers[i].setMap(null);
+
+              if(what_is_it != "zombie"){
+                score = score + 10;
+                alert("Your score is: " + score)
+              }//ends if what_is_it
+
+            }//if distance tolerance statement ends
+          }//ends all_markers for loop
         }//ends set_my_position
 
       </script>
