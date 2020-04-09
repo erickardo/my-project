@@ -104,9 +104,8 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxCrN3-8CYsRl2leka5XwSls9
             map: zombie_map,
             position: pos,
             icon: playerImg,
-            old_position = player;
           });//ends player marker
-
+          old_position = player;
 
           for(i=0; i<all_markers.length; i++){
             var distance = google.maps.geometry.spherical.computeDistanceBetween(pos, all_markers[i].getPosition());
