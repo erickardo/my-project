@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <style>
+      #zombie_map {
+        height: 100%;
+        width: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        background-color: grey;
+      }
+    </style>
+    <meta charset="utf-8">
+    <script async defer
+src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAxCrN3-8CYsRl2leka5XwSls98ygSZz9w&callback=initMap">
+</script>
+    <title>Zombieland</title>
+  </head>
+  <body>
+    <div id="zombie_map">
+      <script>
+        var zombie_map;
+        var data = `20.597093475055726 -100.43316418518064 zombie.png
+                    20.597565496301684 -100.43102914680479 zombie.png
+                    20.599061894420693 -100.43233806480406 zombie.png
+                    20.598783203937767 -100.42826110710142 hospital.png
+                    20.599847748624047 -100.4272311388397 weapons.png`
+        var markers = data.split('\n');
+        function initMap(){
+
+          zombie_map = new google.maps.Map(document.getElementById('zombie_map'), {
+            zoom: 17,
+            center: {lat: 20.598443, lng: -100.433765}
+          });
+
+          if(navigator.geolocation) {
+            navigator.geolocation.watchPosition(set_my_position);
+          }
+          else{
+            alert("Geolocation not working :(");
+          }
+
+
+          //This displays an emoji on the map
+          /*zombie_map.addListener('click',function(e){
+            var location = e.latLng;
+            place_marker(location);
+          });*/
+
+          all_markers = [];
+
+          for (i=0; i < markers.length; i++){
+            var marker_data = markers[i].trim();
+            marker_data = marker_data.split(" ");
+
+            var latitude = marker_data[0];
+            var longitude = marker_data[1];
+            var emoji = marker_data[2];
+
+            var marker_position = new google.maps.LatLng(latitude, longitude);
+            var marker = new google.maps.Marker({
+              map : zombie_map,
+              position: marker_position,
+              icon: emoji,
+            });
+
+            all_markers.push(marker);
+
+          }//Here ends the for loop
+
+
+
+        //This displays an emoji on the map
+        /*function place_marker(location){
+          var emoji = document.getElementById('icon_to_use').value;
+          var marker = new google.maps.Marker({
+            map : zombie_map,
+            position: location,
+            icon: emoji,
+          });*/
+
+        }//ends initMap
+
+        function set_my_position(position){
+          var playerImg = "player.png";
+          var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          var player = new google.maps.Marker({
+            map: zombie_map,
+            position: pos,
+            icon: playerImg,
+          });//ends player marker
+
+        }//ends set_my_position
+
+      </script>
+    </div>
+    <form style="position:relative; margin-top:40%; margin-left:40px;">
+        Select an emoji
+        <select id="icon_to_use">
+          <option value="zombie.png">Zombie</option>
+          <option value="hospital.png">Hospital</option>
+          <option value="weapons.png">Weapons</option>
+
+        </select>
+    </form>
+  </body>
+</html>
